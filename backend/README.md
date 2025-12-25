@@ -39,7 +39,7 @@ npm install
 npm run dev
 
 🚀 Future Enhancements
-Direct payments to vet clinics
+Direct payments to pet clinics
 Adoption workflow
 Geo-based pet discovery
 Donor badges & certificates
