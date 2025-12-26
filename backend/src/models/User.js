@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
         type:String,
         enum:['donor','owner','shelter','admin'],
         default:'donor',
-    };
+    },
 
     verified:{
         type:Boolean,
