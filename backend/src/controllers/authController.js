@@ -1,27 +1,32 @@
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
 
+const normalizeRole = (r) => {
+  const map = { donor: 'Donor', owner: 'Owner', shelter: 'Shelter', admin: 'Admin' };
+  return map[String(r || '').toLowerCase()] || 'Donor';
+};
+
 export const registerUser = async (req, res) => {
-    const { name, email, password, role } = req.body;
+  const { name, email, password, role } = req.body;
 
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-        return res.status(400).json({ message: 'User already exists' });
-    }
+  const userExists = await User.findOne({ email });
+  if (userExists) {
+    return res.status(400).json({ message: 'User already exists' });
+  }
 
-    const user = await User.create({
-        name,
-        email, 
-        password, 
-        role 
-    });
-    res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token: generateToken(user._id),
-    });
+  const user = await User.create({
+    name,
+    email,
+    password,
+    role: normalizeRole(role),
+  });
+  res.status(201).json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    token: generateToken(user._id),
+  });
 };
 
 // LOGIN 
