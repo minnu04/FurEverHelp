@@ -14,7 +14,7 @@ const router = express.Router();
 router.post(
     '/',
     authMiddleware,
-    roleMiddleware(['Owner', 'Shelter']),
+    roleMiddleware('Owner', 'Shelter'),
     createCampaign
 );
 
