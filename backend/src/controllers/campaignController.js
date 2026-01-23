@@ -105,3 +105,60 @@ export const deleteCampaign = async (req, res) => {
 };
 
 
+/* SEARCH & FILTER CAMPAIGNS */
+export const searchCampaigns = async (req, res) => {
+  try {
+    const {
+      keyword,
+      category,
+      species,
+      location,
+      urgent,
+      progress
+    } = req.query;
+
+    let filter = { campaignStatus: "Approved" };
+
+    /* Keyword search */
+    if (keyword) {
+      filter.$or = [
+        { title: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } }
+      ];
+    }
+
+    /* Category filter */
+    if (category) {
+      filter.category = category;
+    }
+
+    /* Pet species */
+    if (species) {
+      filter["pet.species"] = species;
+    }
+
+    /* Location */
+    if (location) {
+      filter["pet.location"] = { $regex: location, $options: "i" };
+    }
+
+    /* Urgency (less than 7 days left) */
+    if (urgent === "true") {
+      const sevenDaysFromNow = new Date();
+      sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+      filter.deadline = { $lte: sevenDaysFromNow };
+    }
+
+    /* Funding progress */
+    if (progress === "funded") {
+      filter.$expr = { $gte: ["$raisedAmount", "$goalAmount"] };
+    }
+
+    const campaigns = await Campaign.find(filter)
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(campaigns);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

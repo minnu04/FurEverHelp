@@ -5,7 +5,8 @@ import {
     getCampaignById,
     getMyCampaigns,
     updateCampaign,
-    deleteCampaign
+    deleteCampaign,
+    searchCampaigns
 } from '../controllers/campaignController.js';
 
 import authMiddleware from '../middlewares/authMiddleware.js';
@@ -44,6 +45,7 @@ router.delete(
 );
 // public routes
 
+router.get("/search", searchCampaigns);
 router.get('/', getCampaigns);
 router.get('/:id', getCampaignById);
 
