@@ -25,6 +25,3 @@ const adminLogSchema = new mongoose.Schema({
 });
 
 export default mongoose.model('AdminLog', adminLogSchema);
-
-
-
