@@ -43,7 +43,7 @@ export const rejectCampaign = async (req, res) => {
         if (!campaign) {
             return res.status(404).json({ message: 'Campaign not found' });
         }
-        campaign.campaignStatus = 'REJECTED';
+        campaign.campaignStatus = 'Rejected';
 
         await campaign.save();
 
