@@ -5,6 +5,7 @@ import profileRoutes from './routes/profileRoutes.js';
 import campaignRoutes from './routes/campaignRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import donationRoutes from "./routes/donationRoutes.js";
+import dashboardRoutes from './routes/dashboardRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import razorpayWebhook from "./webhooks/razorpayWebhook.js"
 import errorMiddleware from './middlewares/errorMiddleware.js';
@@ -21,6 +22,7 @@ app.use('/api', profileRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/donations', donationRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.post(
     '/api/webhooks/razorpay', 

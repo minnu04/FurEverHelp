@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const adminLogSchema = new mongoose.Schema({
     admin:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Admin',
+        ref: 'User',
         required: true
     },
     action: {
