@@ -27,6 +27,9 @@ const donationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    signature: {
+      type: String,
+    },
 
     status: {
       type: String,
