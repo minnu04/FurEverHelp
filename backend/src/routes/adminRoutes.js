@@ -2,7 +2,8 @@ import express from 'express';
 import {
   getPendingCampaigns,
   approveCampaign,
-  rejectCampaign
+    rejectCampaign,
+    getAdminLogs
 } from '../controllers/adminController.js';
 
 import authMiddleware from '../middlewares/authMiddleware.js';
@@ -28,6 +29,12 @@ router.put('/campaigns/:id/reject',
     validateParams({ id: { required: true, type: 'objectId' } }),
     validateBody({ reason: { required: true, type: 'string', minLength: 3 } }),
     rejectCampaign
+);
+
+router.get('/logs',
+    authMiddleware,
+    roleMiddleware('ADMIN'),
+    getAdminLogs
 );
 
 export default router;

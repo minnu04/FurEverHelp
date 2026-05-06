@@ -82,8 +82,6 @@ export const updateCampaign = async (req, res) => {
     campaign.isEmergencyRequest = req.body.isEmergencyRequest ?? campaign.isEmergencyRequest;
     campaign.preferredTimeSlot = req.body.preferredTimeSlot || campaign.preferredTimeSlot;
 
-    campaign.campaignStatus = 'Pending';
-
     const updatedCampaign = await campaign.save();
     res.status(200).json(updatedCampaign);
   } catch (error) {

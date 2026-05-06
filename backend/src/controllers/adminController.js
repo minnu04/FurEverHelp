@@ -59,4 +59,17 @@ export const rejectCampaign = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Server Error', error: error.message });
     }
-};  
+};
+
+export const getAdminLogs = async (req, res) => {
+    try {
+        const logs = await AdminLog.find()
+            .populate('admin', 'name email role')
+            .populate('campaign', 'title campaignStatus createdBy')
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(logs);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error', error: error.message });
+    }
+};

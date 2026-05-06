@@ -25,6 +25,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.post(
     '/',
     authMiddleware,
+    roleMiddleware('Owner', 'Shelter'),
         validateBody({
             title: { required: true, type: 'string', minLength: 3 },
             description: { required: true, type: 'string', minLength: 10 },
@@ -42,6 +43,7 @@ router.post(
 router.get(
     '/my',
     authMiddleware,
+    roleMiddleware('Owner', 'Shelter'),
     getMyCampaigns
 );
 // UPDATE CAMPAIGN - Owner/Shelter
