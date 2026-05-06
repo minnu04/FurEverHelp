@@ -31,6 +31,8 @@ const CampaignSchema = new mongoose.Schema(
     goalAmount: { type: Number, required: true },
     raisedAmount: { type: Number, default: 0 },
     deadline: { type: Date, required: true },
+    isEmergencyRequest: { type: Boolean, default: false },
+    preferredTimeSlot: { type: String, trim: true },
 
     // Status and transparecy
     campaignStatus: {

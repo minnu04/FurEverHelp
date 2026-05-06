@@ -4,8 +4,8 @@ import AdminLog from '../models/AdminLog.js';
 export const getPendingCampaigns = async (req, res) => {
     try {
         const pendingCampaigns = await Campaign.find({
-             status: 'PENDING' 
-            }).populate('creator', 'name email');
+             campaignStatus: 'Pending' 
+            }).populate('createdBy', 'name email');
         res.status(200).json(pendingCampaigns);
     }   catch (error) { 
         res.status(500).json({ message: 'Server Error', error: error.message });
@@ -18,8 +18,8 @@ export const approveCampaign = async (req, res) => {
         if (!campaign) {
             return res.status(404).json({ message: 'Campaign not found' });
         }
-        campaign.status = 'APPROVED';
-        campaign.approvedAt = req.user._id;
+        campaign.campaignStatus = 'Approved';
+        campaign.approvedBy = req.user._id;
 
         await campaign.save();
 

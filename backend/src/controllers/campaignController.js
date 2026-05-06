@@ -9,6 +9,8 @@ export const createCampaign = async (req, res) => {
       pet: req.body.pet,
       goalAmount: req.body.goalAmount,
       deadline: req.body.deadline,
+      isEmergencyRequest: Boolean(req.body.isEmergencyRequest),
+      preferredTimeSlot: req.body.preferredTimeSlot,
       createdBy: req.user._id,
     });
     res.status(201).json(campaign);
@@ -77,6 +79,8 @@ export const updateCampaign = async (req, res) => {
     campaign.pet = req.body.pet || campaign.pet;
     campaign.goalAmount = req.body.goalAmount || campaign.goalAmount;
     campaign.deadline = req.body.deadline || campaign.deadline;
+    campaign.isEmergencyRequest = req.body.isEmergencyRequest ?? campaign.isEmergencyRequest;
+    campaign.preferredTimeSlot = req.body.preferredTimeSlot || campaign.preferredTimeSlot;
 
     campaign.campaignStatus = 'Pending';
 
