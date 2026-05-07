@@ -6,11 +6,13 @@ const Register = () => {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    role: "Student",
+    role: "Donor",
     password: "",
     confirmPassword: "",
   });
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (event) => {
@@ -21,71 +23,192 @@ const Register = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setMessage("");
+    setMessageType("");
+    setLoading(true);
 
     if (form.password !== form.confirmPassword) {
-      setMessage("Password and confirm password do not match.");
+      setMessage("Passwords do not match.");
+      setMessageType("error");
+      setLoading(false);
       return;
     }
 
     try {
       await API.post("/auth/register", form);
-      setMessage("Account created successfully. You can now log in.");
-      navigate("/login");
+      setMessage("✅ Account created! Redirecting to login...");
+      setMessageType("success");
+      setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
       setMessage(error.response?.data?.message || "Unable to create account.");
+      setMessageType("error");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const roles = [
+    { value: "Owner", label: "🐾 Pet Owner/Rescuer" },
+    { value: "Shelter", label: "🏥 Animal Shelter" },
+    { value: "Donor", label: "💝 Donor" },
+  ];
+
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Create Account</h2>
-      <p>Students and faculty must register with a college email ending in @klu.ac.in.</p>
+    <div className="min-h-screen bg-gradient-to-b from-dark-bg via-dark-card to-dark-bg flex items-center justify-center px-4 pt-20 pb-20">
+      <div className="w-full max-w-md animate-fade-in">
+        {/* Card */}
+        <div className="bg-dark-card border border-dark-border rounded-3xl p-8 md:p-12 backdrop-blur-md shadow-card-hover">
+          {/* Header */}
+          <div className="text-center mb-8 space-y-2">
+            <div className="text-5xl mb-4">🚀</div>
+            <h1 className="text-3xl font-bold text-dark-text">Join FurEverHelp</h1>
+            <p className="text-dark-muted text-sm">Create your account and start making a difference</p>
+          </div>
 
-      <input
-        name="name"
-        placeholder="Full name"
-        value={form.name}
-        onChange={handleChange}
-      />
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Name */}
+            <div className="space-y-2">
+              <label htmlFor="name" className="block text-sm font-bold text-dark-text">
+                Full Name
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="John Doe"
+                value={form.name}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 bg-dark-bg border-2 border-dark-border rounded-xl text-dark-text placeholder-dark-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-20 transition"
+              />
+            </div>
 
-      <input
-        type="email"
-        name="email"
-        placeholder="College email"
-        value={form.email}
-        onChange={handleChange}
-      />
+            {/* Email */}
+            <div className="space-y-2">
+              <label htmlFor="email" className="block text-sm font-bold text-dark-text">
+                Email Address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                value={form.email}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 bg-dark-bg border-2 border-dark-border rounded-xl text-dark-text placeholder-dark-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-20 transition"
+              />
+            </div>
 
-      <select name="role" value={form.role} onChange={handleChange}>
-        <option value="Student">Student</option>
-        <option value="Faculty">Faculty</option>
-        <option value="Donor">Donor</option>
-      </select>
+            {/* Role */}
+            <div className="space-y-2">
+              <label htmlFor="role" className="block text-sm font-bold text-dark-text">
+                I am a
+              </label>
+              <select
+                id="role"
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-white border-2 border-dark-border rounded-xl text-[#0a0e0f] focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-20 transition cursor-pointer"
+              >
+                {roles.map((r) => (
+                  <option key={r.value} value={r.value} className="bg-white text-[#0a0e0f]">
+                    {r.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={form.password}
-        onChange={handleChange}
-      />
+            {/* Password */}
+            <div className="space-y-2">
+              <label htmlFor="password" className="block text-sm font-bold text-dark-text">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                value={form.password}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 bg-dark-bg border-2 border-dark-border rounded-xl text-dark-text placeholder-dark-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-20 transition"
+              />
+            </div>
 
-      <input
-        type="password"
-        name="confirmPassword"
-        placeholder="Confirm password"
-        value={form.confirmPassword}
-        onChange={handleChange}
-      />
+            {/* Confirm Password */}
+            <div className="space-y-2">
+              <label htmlFor="confirmPassword" className="block text-sm font-bold text-dark-text">
+                Confirm Password
+              </label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                value={form.confirmPassword}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 bg-dark-bg border-2 border-dark-border rounded-xl text-dark-text placeholder-dark-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-20 transition"
+              />
+            </div>
 
-      <button type="submit">Create account</button>
+            {/* Message */}
+            {message && (
+              <div
+                className={`p-4 rounded-xl text-sm font-medium ${
+                  messageType === "error"
+                    ? "bg-accent bg-opacity-10 border border-accent border-opacity-50 text-accent"
+                    : "bg-green-500 bg-opacity-10 border border-green-500 border-opacity-50 text-green-400"
+                }`}
+              >
+                {message}
+              </div>
+            )}
 
-      {message ? <p>{message}</p> : null}
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 bg-primary text-campagne font-bold rounded-xl hover:shadow-glow-lg transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+            >
+              {loading ? "🔄 Creating account..." : "✨ Create Account"}
+            </button>
+          </form>
 
-      <p>
-        Already have an account? <Link to="/login">Login</Link>
-      </p>
-    </form>
+          {/* Divider */}
+          <div className="my-8 flex items-center">
+            <div className="flex-1 border-t border-dark-border"></div>
+            <div className="px-3 text-xs text-dark-muted">OR</div>
+            <div className="flex-1 border-t border-dark-border"></div>
+          </div>
+
+          {/* Login Link */}
+          <div className="text-center space-y-4">
+            <p className="text-sm text-dark-muted">
+              Already have an account?{" "}
+              <Link to="/login" className="font-bold text-primary hover:text-accent transition">
+                Sign in
+              </Link>
+            </p>
+            <Link
+              to="/"
+              className="block text-sm text-dark-muted hover:text-primary transition"
+            >
+              ← Back to Home
+            </Link>
+          </div>
+        </div>
+
+        {/* Side Info */}
+        <div className="mt-8 text-center space-y-2">
+          <p className="text-sm text-dark-muted">
+            Join our community helping rescued pets 🐾💚
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 

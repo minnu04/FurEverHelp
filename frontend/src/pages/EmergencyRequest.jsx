@@ -96,23 +96,23 @@ const EmergencyRequest = () => {
         <input name="goalAmount" type="number" placeholder="Goal amount" value={form.goalAmount} onChange={handleChange} />
         <input name="deadline" type="date" value={form.deadline} onChange={handleChange} />
 
-        <select name="category" value={form.category} onChange={handleChange}>
-          <option>Medical Care</option>
-          <option>Rescue & Shelter</option>
-          <option>Adoption Support</option>
-          <option>Stray Feeding</option>
-          <option>Vaccination</option>
+        <select name="category" value={form.category} onChange={handleChange} className="bg-white text-[#0a0e0f]">
+          <option className="bg-white text-[#0a0e0f]">Medical Care</option>
+          <option className="bg-white text-[#0a0e0f]">Rescue & Shelter</option>
+          <option className="bg-white text-[#0a0e0f]">Adoption Support</option>
+          <option className="bg-white text-[#0a0e0f]">Stray Feeding</option>
+          <option className="bg-white text-[#0a0e0f]">Vaccination</option>
         </select>
 
-        <select name="species" value={form.species} onChange={handleChange}>
-          <option>Dog</option>
-          <option>Cat</option>
-          <option>Other</option>
+        <select name="species" value={form.species} onChange={handleChange} className="bg-white text-[#0a0e0f]">
+          <option className="bg-white text-[#0a0e0f]">Dog</option>
+          <option className="bg-white text-[#0a0e0f]">Cat</option>
+          <option className="bg-white text-[#0a0e0f]">Other</option>
         </select>
 
-        <select name="preferredTimeSlot" value={form.preferredTimeSlot} onChange={handleChange}>
+        <select name="preferredTimeSlot" value={form.preferredTimeSlot} onChange={handleChange} className="bg-white text-[#0a0e0f]">
           {timeSlots.map((slot) => (
-            <option key={slot} value={slot}>
+            <option key={slot} value={slot} className="bg-white text-[#0a0e0f]">
               {slot}
             </option>
           ))}
