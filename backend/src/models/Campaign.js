@@ -49,6 +49,7 @@ const CampaignSchema = new mongoose.Schema(
     // Media (Cloudinary URLs)
     images: [{ type: String }],
     videos: [{ type: String }],
+    featuredImage: { type: String }, // Primary image for campaign display
 
     // Ownership and Admin Control
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
