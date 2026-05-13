@@ -12,10 +12,15 @@ import {
 import {
     createCampaignUpdate,
     getCampaignUpdates,
+    uploadCampaignImages,
+    reorderCampaignImages,
+    deleteCampaignImage,
+    setFeaturedImage,
 } from '../controllers/uploadController.js';
 
 import authMiddleware from '../middlewares/authMiddleware.js';
 import roleMiddleware from '../middlewares/roleMiddleware.js';
+import campaignImageUpload from '../middlewares/campaignImageUpload.js';
 import { validateBody, validateParams, validateQuery } from '../utils/validateRequest.js';
 
 const router = express.Router();
@@ -101,5 +106,52 @@ router.post(
 );
 
     router.get('/:id', validateParams({ id: { required: true, type: 'objectId' } }), getCampaignById);
+
+// ===== CAMPAIGN IMAGE ROUTES =====
+// Upload images to campaign
+router.post(
+    '/:id/images',
+    authMiddleware,
+    roleMiddleware('Owner', 'Shelter', 'Admin'),
+    validateParams({ id: { required: true, type: 'objectId' } }),
+    campaignImageUpload.array('images', 10),
+    uploadCampaignImages
+);
+
+// Reorder campaign images
+router.put(
+    '/:id/images/reorder',
+    authMiddleware,
+    roleMiddleware('Owner', 'Shelter', 'Admin'),
+    validateParams({ id: { required: true, type: 'objectId' } }),
+    validateBody({
+        imageOrder: { required: true, type: 'array' },
+    }),
+    reorderCampaignImages
+);
+
+// Set featured image
+router.put(
+    '/:id/featured-image',
+    authMiddleware,
+    roleMiddleware('Owner', 'Shelter', 'Admin'),
+    validateParams({ id: { required: true, type: 'objectId' } }),
+    validateBody({
+        imageUrl: { required: true, type: 'string' },
+    }),
+    setFeaturedImage
+);
+
+// Delete specific image from campaign
+router.delete(
+    '/:id/images/:imageUrl',
+    authMiddleware,
+    roleMiddleware('Owner', 'Shelter', 'Admin'),
+    validateParams({ 
+        id: { required: true, type: 'objectId' },
+        imageUrl: { required: true, type: 'string' }
+    }),
+    deleteCampaignImage
+);
 
 export default router;
