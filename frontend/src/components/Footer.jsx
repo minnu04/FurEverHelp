@@ -1,8 +1,13 @@
 import { Globe, Mail, MapPin, Phone, Send, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { user } = useContext(AuthContext);
+  const startCampaignTarget = user ? "/request-emergency" : "/login";
+  const startCampaignState = user ? undefined : { from: { pathname: "/request-emergency" } };
 
   return (
     <footer id="contact" className="border-t border-white/10 bg-[#071117] text-white">
@@ -32,7 +37,7 @@ const Footer = () => {
             <nav className="space-y-3 text-sm text-white/65">
               <Link to="/" className="block transition hover:text-[#f9e4da]">Home</Link>
               <Link to="/campaigns" className="block transition hover:text-[#f9e4da]">Campaigns</Link>
-              <Link to="/register" className="block transition hover:text-[#f9e4da]">Start a Campaign</Link>
+              <Link to={startCampaignTarget} state={startCampaignState} className="block transition hover:text-[#f9e4da]">Start a Campaign</Link>
               <a href="#about" className="block transition hover:text-[#f9e4da]">About</a>
             </nav>
           </div>

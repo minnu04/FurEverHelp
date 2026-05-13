@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { ArrowRight, HeartHandshake, PawPrint, ShieldCheck, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const heroStats = [
   { label: "Pets rescued", value: "500+" },
@@ -10,6 +12,9 @@ const heroStats = [
 
 const HeroSection = () => {
   const MotionDiv = motion.div;
+  const { user } = useContext(AuthContext);
+  const startCampaignTarget = user ? "/request-emergency" : "/login";
+  const startCampaignState = user ? undefined : { from: { pathname: "/request-emergency" } };
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-[#1d503a] via-black to-[#f9e4da] px-4 pt-28 pb-20 text-white">
@@ -48,7 +53,8 @@ const HeroSection = () => {
               Browse Campaigns <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
-              to="/register"
+              to={startCampaignTarget}
+              state={startCampaignState}
               className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/25 bg-white/10 px-7 py-4 font-semibold text-white backdrop-blur-md transition-transform duration-300 hover:-translate-y-1 hover:bg-white/15"
             >
               Start a Campaign <HeartHandshake className="h-4 w-4" />

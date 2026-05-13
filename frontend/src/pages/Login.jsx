@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import API from "../api/axiosInstance";
 import { AuthContext } from "../context/AuthContext";
 
@@ -10,6 +10,8 @@ const Login = () => {
   const [error, setError] = useState("");
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromPath = location.state?.from?.pathname || location.state?.from || "/dashboard";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +25,7 @@ const Login = () => {
       });
 
       login(data);
-      navigate("/dashboard");
+      navigate(fromPath, { replace: true });
     } catch (loginError) {
       setError(loginError.response?.data?.message || "Unable to log in.");
     } finally {

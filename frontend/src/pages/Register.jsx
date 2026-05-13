@@ -9,37 +9,103 @@ const Register = () => {
     role: "Donor",
     password: "",
     confirmPassword: "",
+    adminKey: "",
   });
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+  const [errors, setErrors] = useState({}); // Field-specific errors
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  // Client-side validation
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!form.name || form.name.trim().length < 2) {
+      newErrors.name = "Full name must be at least 2 characters";
+    }
+
+    if (!form.email) {
+      newErrors.email = "Email address is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      newErrors.email = "Email address must be valid";
+    }
+
+    if (!form.password) {
+      newErrors.password = "Password is required";
+    } else if (form.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    if (!form.confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password";
+    } else if (form.password !== form.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    return newErrors;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setMessage("");
     setMessageType("");
+    setErrors({});
     setLoading(true);
 
-    if (form.password !== form.confirmPassword) {
-      setMessage("Passwords do not match.");
+    // Client-side validation
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      setMessage("Please fix the errors below");
       setMessageType("error");
       setLoading(false);
       return;
     }
 
     try {
-      await API.post("/auth/register", form);
+      const payload = {
+        name: form.name,
+        email: form.email,
+        role: form.role,
+        password: form.password,
+        confirmPassword: form.confirmPassword,
+      };
+      if (form.role === "Admin") {
+        payload.adminKey = form.adminKey;
+      }
+      await API.post("/auth/register", payload);
       setMessage("✅ Account created! Redirecting to login...");
       setMessageType("success");
       setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
-      setMessage(error.response?.data?.message || "Unable to create account.");
+      const errorData = error.response?.data;
+      
+      // Handle field-specific errors from backend
+      if (errorData?.errors && Array.isArray(errorData.errors)) {
+        const fieldErrors = {};
+        errorData.errors.forEach((err) => {
+          fieldErrors[err.field] = err.message;
+        });
+        setErrors(fieldErrors);
+        setMessage(errorData.message || "Validation failed. Please check the errors below.");
+      } else {
+        setMessage(errorData?.message || "Unable to create account. Please try again.");
+      }
+      
       setMessageType("error");
     } finally {
       setLoading(false);
@@ -50,6 +116,7 @@ const Register = () => {
     { value: "Owner", label: "🐾 Pet Owner/Rescuer" },
     { value: "Shelter", label: "🏥 Animal Shelter" },
     { value: "Donor", label: "💝 Donor" },
+    { value: "Admin", label: "👮 Platform Admin" },
   ];
 
   return (
@@ -79,8 +146,13 @@ const Register = () => {
                 value={form.name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-dark-bg border-2 border-dark-border rounded-xl text-dark-text placeholder-dark-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-20 transition"
+                className={`w-full px-4 py-3 bg-dark-bg border-2 rounded-xl text-dark-text placeholder-dark-muted focus:outline-none focus:ring-2 focus:ring-opacity-20 transition ${
+                  errors.name
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                    : "border-dark-border focus:border-primary focus:ring-primary"
+                }`}
               />
+              {errors.name && <p className="text-red-400 text-xs font-medium">{errors.name}</p>}
             </div>
 
             {/* Email */}
@@ -96,8 +168,13 @@ const Register = () => {
                 value={form.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-dark-bg border-2 border-dark-border rounded-xl text-dark-text placeholder-dark-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-20 transition"
+                className={`w-full px-4 py-3 bg-dark-bg border-2 rounded-xl text-dark-text placeholder-dark-muted focus:outline-none focus:ring-2 focus:ring-opacity-20 transition ${
+                  errors.email
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                    : "border-dark-border focus:border-primary focus:ring-primary"
+                }`}
               />
+              {errors.email && <p className="text-red-400 text-xs font-medium">{errors.email}</p>}
             </div>
 
             {/* Role */}
@@ -120,6 +197,31 @@ const Register = () => {
               </select>
             </div>
 
+            {/* Admin Key (only show for Admin role) */}
+            {form.role === "Admin" && (
+              <div className="space-y-2 rounded-xl border-2 border-amber-500/30 bg-amber-500/10 p-4">
+                <label htmlFor="adminKey" className="block text-sm font-bold text-dark-text">
+                  Admin Secret Key
+                </label>
+                <input
+                  id="adminKey"
+                  name="adminKey"
+                  type="password"
+                  placeholder="Enter admin key"
+                  value={form.adminKey}
+                  onChange={handleChange}
+                  required
+                  className={`w-full px-4 py-3 bg-dark-bg border-2 rounded-xl text-dark-text placeholder-dark-muted focus:outline-none focus:ring-2 focus:ring-opacity-20 transition ${
+                    errors.adminKey
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                      : "border-dark-border focus:border-primary focus:ring-primary"
+                  }`}
+                />
+                <p className="text-xs text-amber-300">Contact your platform administrator for the admin key.</p>
+                {errors.adminKey && <p className="text-red-400 text-xs font-medium">{errors.adminKey}</p>}
+              </div>
+            )}
+
             {/* Password */}
             <div className="space-y-2">
               <label htmlFor="password" className="block text-sm font-bold text-dark-text">
@@ -133,8 +235,14 @@ const Register = () => {
                 value={form.password}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-dark-bg border-2 border-dark-border rounded-xl text-dark-text placeholder-dark-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-20 transition"
+                className={`w-full px-4 py-3 bg-dark-bg border-2 rounded-xl text-dark-text placeholder-dark-muted focus:outline-none focus:ring-2 focus:ring-opacity-20 transition ${
+                  errors.password
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                    : "border-dark-border focus:border-primary focus:ring-primary"
+                }`}
               />
+              {errors.password && <p className="text-red-400 text-xs font-medium">{errors.password}</p>}
+              <p className="text-xs text-dark-muted">Minimum 6 characters</p>
             </div>
 
             {/* Confirm Password */}
@@ -150,8 +258,13 @@ const Register = () => {
                 value={form.confirmPassword}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-dark-bg border-2 border-dark-border rounded-xl text-dark-text placeholder-dark-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-20 transition"
+                className={`w-full px-4 py-3 bg-dark-bg border-2 rounded-xl text-dark-text placeholder-dark-muted focus:outline-none focus:ring-2 focus:ring-opacity-20 transition ${
+                  errors.confirmPassword
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                    : "border-dark-border focus:border-primary focus:ring-primary"
+                }`}
               />
+              {errors.confirmPassword && <p className="text-red-400 text-xs font-medium">{errors.confirmPassword}</p>}
             </div>
 
             {/* Message */}
